@@ -1,15 +1,25 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import Cookies from "js-cookie";
 
-export default function ProtectedRoute({ children }) {
-    const { user } = useAuth();
-    const token = Cookies.get("token");
+export default function ProtectedRoute() {
+    const { user, loading } = useAuth();
 
-    if (!token || !user) {
-        console.log(" Acceso denegado, redirigiendo a login");
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600 text-lg">Verificando sesión...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!user) {
+        console.log("❌ No hay usuario, redirigiendo a /login");
         return <Navigate to="/login" replace />;
     }
 
-    return children;
+    console.log("✅ Usuario autenticado, permitiendo acceso");
+    return <Outlet />;
 }
